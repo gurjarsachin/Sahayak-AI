@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -12,6 +14,8 @@ export default function SignupPage() {
   });
   const [errors, setErrors] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { signup } = useAuth();
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -53,25 +57,18 @@ export default function SignupPage() {
     if (!validateForm()) return;
 
     setIsLoading(true);
+    setErrors([]);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await signup(formData.email, formData.password, formData.name);
       
-      // Store user data in localStorage (temporary solution)
-      const userData = {
-        name: formData.name,
-        email: formData.email,
-        id: Date.now().toString()
-      };
-      
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('isAuthenticated', 'true');
-      
-      // Redirect to dashboard
-      window.location.href = '/';
+      if (result.success) {
+        router.push('/');
+      } else {
+        setErrors([result.error || 'Signup failed. Please try again.']);
+      }
     } catch (error) {
-      setErrors(['Signup failed. Please try again.']);
+      setErrors(['An unexpected error occurred. Please try again.']);
     } finally {
       setIsLoading(false);
     }

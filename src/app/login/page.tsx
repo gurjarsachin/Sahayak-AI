@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -10,6 +12,8 @@ export default function LoginPage() {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -24,28 +28,15 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await login(formData.email, formData.password);
       
-      // For demo purposes, accept any email/password combination
-      // In a real app, you'd validate against your backend
-      if (formData.email && formData.password) {
-        const userData = {
-          name: 'Demo User',
-          email: formData.email,
-          id: Date.now().toString()
-        };
-        
-        localStorage.setItem('user', JSON.stringify(userData));
-        localStorage.setItem('isAuthenticated', 'true');
-        
-        // Redirect to dashboard
-        window.location.href = '/';
+      if (result.success) {
+        router.push('/');
       } else {
-        setError('Please enter both email and password');
+        setError(result.error || 'Login failed. Please try again.');
       }
     } catch (error) {
-      setError('Login failed. Please try again.');
+      setError('An unexpected error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
