@@ -4,52 +4,102 @@ import { useState } from 'react';
 import Link from 'next/link';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login clicked:', email, password);
-    // 🔐 Replace with real login logic
+    setError('');
+    setIsLoading(true);
+
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // For demo purposes, accept any email/password combination
+      // In a real app, you'd validate against your backend
+      if (formData.email && formData.password) {
+        const userData = {
+          name: 'Demo User',
+          email: formData.email,
+          id: Date.now().toString()
+        };
+        
+        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('isAuthenticated', 'true');
+        
+        // Redirect to dashboard
+        window.location.href = '/';
+      } else {
+        setError('Please enter both email and password');
+      }
+    } catch (error) {
+      setError('Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200">
       <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-center text-indigo-700 mb-6">Login to Sahayak AI</h2>
+        
+        {error && (
+          <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
+
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label className="block text-gray-700 font-semibold mb-1">Email</label>
             <input
               type="email"
+              name="email"
               required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="you@example.com"
             />
           </div>
+          
           <div>
             <label className="block text-gray-700 font-semibold mb-1">Password</label>
             <input
               type="password"
+              name="password"
               required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={formData.password}
+              onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="••••••••"
             />
           </div>
+          
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition"
+            disabled={isLoading}
+            className="w-full bg-indigo-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-indigo-700 transition disabled:opacity-50"
           >
-            Login
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
         </form>
 
         <p className="mt-4 text-center text-sm text-gray-600">
-          Don’t have an account?{' '}
+          Don't have an account?{' '}
           <Link href="/signup" className="text-indigo-600 hover:underline">
             Sign up
           </Link>
