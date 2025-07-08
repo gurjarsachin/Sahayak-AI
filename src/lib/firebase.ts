@@ -6,13 +6,13 @@ import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBPXXdtyXPqXZAqgsYHYfRVE-ymrVVmGRs",
-  authDomain: "sahayak-ai-a033d.firebaseapp.com",
-  projectId: "sahayak-ai-a033d",
-  storageBucket: "sahayak-ai-a033d.firebasestorage.app",
-  messagingSenderId: "334204056006",
-  appId: "1:334204056006:web:d15c9f410f1d332b57c2c7",
-  measurementId: "G-CR0V2JZ0X1"
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: `${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.firebaseapp.com`,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: `${process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID}.firebasestorage.app`,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase
