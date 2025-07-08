@@ -10,6 +10,7 @@ export default function LoginPage() {
     email: '',
     password: ''
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();

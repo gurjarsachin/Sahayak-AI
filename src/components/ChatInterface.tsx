@@ -79,6 +79,7 @@ export default function ChatInterface({ grade }: ChatInterfaceProps) {
         };
         setMessages(prev => [...prev, errorMessage]);
       }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),

@@ -12,6 +12,7 @@ export default function SignupPage() {
     password: '',
     confirmPassword: ''
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [errors, setErrors] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { signup } = useAuth();

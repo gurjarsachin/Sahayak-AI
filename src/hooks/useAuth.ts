@@ -10,6 +10,7 @@ import {
   updateProfile
 } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { FirebaseError } from 'firebase/app';
 import { auth, db } from '../lib/firebase';
 
 interface User {
@@ -75,9 +76,15 @@ export function useAuth() {
       });
 
       return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Signup error:', error);
-      return { success: false, error: error.message };
+      
+      let errorMessage = 'An error occurred during signup. Please try again.';
+      if (error instanceof FirebaseError) {
+        errorMessage = error.message;
+      }
+      
+      return { success: false, error: errorMessage };
     }
   };
 
@@ -85,33 +92,35 @@ export function useAuth() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Login error:', error);
       
       // Convert Firebase error codes to user-friendly messages
       let userFriendlyMessage = 'An error occurred during login. Please try again.';
       
-      switch (error.code) {
-        case 'auth/invalid-credential':
-          userFriendlyMessage = 'Invalid email or password. Please check your credentials.';
-          break;
-        case 'auth/user-not-found':
-          userFriendlyMessage = 'No account found with this email address.';
-          break;
-        case 'auth/wrong-password':
-          userFriendlyMessage = 'Incorrect password. Please try again.';
-          break;
-        case 'auth/invalid-email':
-          userFriendlyMessage = 'Please enter a valid email address.';
-          break;
-        case 'auth/user-disabled':
-          userFriendlyMessage = 'This account has been disabled. Please contact support.';
-          break;
-        case 'auth/too-many-requests':
-          userFriendlyMessage = 'Too many failed attempts. Please try again later.';
-          break;
-        default:
-          userFriendlyMessage = 'Login failed. Please try again.';
+      if (error instanceof FirebaseError) {
+        switch (error.code) {
+          case 'auth/invalid-credential':
+            userFriendlyMessage = 'Invalid email or password. Please check your credentials.';
+            break;
+          case 'auth/user-not-found':
+            userFriendlyMessage = 'No account found with this email address.';
+            break;
+          case 'auth/wrong-password':
+            userFriendlyMessage = 'Incorrect password. Please try again.';
+            break;
+          case 'auth/invalid-email':
+            userFriendlyMessage = 'Please enter a valid email address.';
+            break;
+          case 'auth/user-disabled':
+            userFriendlyMessage = 'This account has been disabled. Please contact support.';
+            break;
+          case 'auth/too-many-requests':
+            userFriendlyMessage = 'Too many failed attempts. Please try again later.';
+            break;
+          default:
+            userFriendlyMessage = 'Login failed. Please try again.';
+        }
       }
       
       return { success: false, error: userFriendlyMessage };
