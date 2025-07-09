@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -17,7 +16,6 @@ function SignupForm() {
   const [errors, setErrors] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { signup } = useAuth();
-  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -65,7 +63,8 @@ function SignupForm() {
       const result = await signup(formData.email, formData.password, formData.name);
       
       if (result.success) {
-        router.push('/');
+        // Use window.location for navigation to avoid router issues
+        window.location.href = '/';
       } else {
         setErrors([result.error || 'Signup failed. Please try again.']);
       }

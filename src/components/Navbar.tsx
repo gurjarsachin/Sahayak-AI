@@ -6,6 +6,11 @@ import { useAuth } from '../hooks/useAuth';
 export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
 
+  const handleLogout = async () => {
+    await logout();
+    // Use window.location for navigation to avoid router issues
+    window.location.href = '/';
+  };
   return (
     <nav className="flex justify-between items-center px-6 py-4 bg-white shadow">
       <Link href="/" className="text-2xl font-bold text-indigo-700">
@@ -17,7 +22,7 @@ export default function Navbar() {
           <>
             <span className="text-gray-600">Welcome, {user.name}</span>
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="text-indigo-600 hover:underline font-medium"
             >
               Logout

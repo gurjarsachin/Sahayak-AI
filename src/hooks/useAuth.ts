@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   User as FirebaseUser,
   onAuthStateChanged,
@@ -23,8 +23,17 @@ export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
+
+  // Handle client-side hydration
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   useEffect(() => {
+    if (!isHydrated) return;
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser: FirebaseUser | null) => {
       if (firebaseUser) {
         // User is signed in
@@ -56,11 +65,21 @@ export function useAuth() {
       setIsLoading(false);
     });
 
+    unsubscribeRef.current = unsubscribe;
+
     // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, []);
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
+      }
+    };
+  }, [isHydrated]);
 
   const signup = async (email: string, password: string, name: string) => {
+    if (!isHydrated) {
+      return { success: false, error: 'Application is still loading. Please try again.' };
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -89,6 +108,10 @@ export function useAuth() {
   };
 
   const login = async (email: string, password: string) => {
+    if (!isHydrated) {
+      return { success: false, error: 'Application is still loading. Please try again.' };
+    }
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       return { success: true };
@@ -128,6 +151,8 @@ export function useAuth() {
   };
 
   const logout = async () => {
+    if (!isHydrated) return;
+
     try {
       await signOut(auth);
     } catch (error) {
@@ -138,7 +163,7 @@ export function useAuth() {
   return {
     user,
     isAuthenticated,
-    isLoading,
+    isLoading: isLoading || !isHydrated,
     signup,
     login,
     logout
