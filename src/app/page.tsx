@@ -1,5 +1,7 @@
 
 
+'use client';
+
 import { useState } from 'react';
 import { Suspense } from 'react';
 import Navbar from '../components/Navbar';
