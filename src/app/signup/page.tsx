@@ -1,18 +1,15 @@
 'use client';
-
 import { useState } from 'react';
 import Link from 'next/link';
-import { Suspense } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
-function SignupForm() {
+export default function SignupPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: ''
   });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [errors, setErrors] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { signup } = useAuth();
@@ -63,7 +60,6 @@ function SignupForm() {
       const result = await signup(formData.email, formData.password, formData.name);
       
       if (result.success) {
-        // Use window.location for navigation to avoid router issues
         window.location.href = '/';
       } else {
         setErrors([result.error || 'Signup failed. Please try again.']);
@@ -158,22 +154,5 @@ function SignupForm() {
         </p>
       </div>
     </div>
-  );
-}
-
-export default function SignupPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200">
-        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
-          </div>
-        </div>
-      </div>
-    }>
-      <SignupForm />
-    </Suspense>
   );
 }
