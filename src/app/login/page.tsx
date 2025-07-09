@@ -1,16 +1,13 @@
 'use client';
-
 import { useState } from 'react';
 import Link from 'next/link';
-import { Suspense } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
-function LoginForm() {
+export default function LoginPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
@@ -31,7 +28,6 @@ function LoginForm() {
       const result = await login(formData.email, formData.password);
       
       if (result.success) {
-        // Use window.location for navigation to avoid router issues
         window.location.href = '/';
       } else {
         setError(result.error || 'Login failed. Please try again.');
@@ -98,22 +94,5 @@ function LoginForm() {
         </p>
       </div>
     </div>
-  );
-}
-
-export default function LoginPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-200">
-        <div className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
-          </div>
-        </div>
-      </div>
-    }>
-      <LoginForm />
-    </Suspense>
   );
 }
